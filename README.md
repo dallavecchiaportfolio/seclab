@@ -48,18 +48,23 @@ A rede foi dividida em sub-redes distintas, simulando VLANs através de software
 ```bash
 echo "net.ipv4.ip_forward=1" | sudo tee -a /etc/sysctl.conf
 sudo sysctl -p
+```
 
 ###
 
 # Interface externa (com DHCP)
+```bash
 auto eth0
 iface eth0 inet dhcp
+```
 
 # Interface interna (com IP fixo)
+```bash
 auto eth1
 iface eth1 inet static
     address 192.168.10.1
     netmask 255.255.255.0
+```
 
 ---
 
@@ -68,21 +73,27 @@ iface eth1 inet static
 ###
 
 # Interface externa (com DHCP)
+```bash
 auto eth0
 iface eth0 inet dhcp
+```
 
 # Interface interna (com IP fixo)
+```bash
 auto eth1
 iface eth1 inet static
     address 192.168.10.1
     netmask 255.255.255.0
+```
 
 ---
 
 📦 Servidor DHCP (isc-dhcp-server)
 
 # Instale o serviço:
+```bash
 sudo apt install isc-dhcp-server
+```
 
 # Configuração em /etc/dhcp/dhcpd.conf:
 subnet 192.168.10.0 netmask 255.255.255.0 {
@@ -103,28 +114,42 @@ INTERFACESv4="eth1"
 ###
 
 # Limpa regras existentes
+```bash
 iptables -F
 iptables -t nat -F
+```
 
 # NAT para acesso à Internet
+```bash
 iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+```
 
 # Permitir comunicação na LAN
+```bash
 iptables -A FORWARD -i eth1 -o eth1 -j ACCEPT
+```
 
 # Permitir saída da rede ofensiva (Kali) para a Internet
+```bash
 iptables -A FORWARD -s 192.168.40.0/24 -o eth0 -j ACCEPT
+```
 
 # Bloquear acesso da Kali para Admin/Usuários
+```bash
 iptables -A FORWARD -s 192.168.40.0/24 -d 192.168.10.0/24 -j DROP
 iptables -A FORWARD -s 192.168.40.0/24 -d 192.168.20.0/24 -j DROP
+```
 
 # Permitir acesso ao PiHole a partir de outras redes
+```bash
 iptables -A FORWARD -d 192.168.10.2 -j ACCEPT
+```
 
 # Salvar regras com iptables-persistent:
+```bash
 sudo apt install iptables-persistent
 sudo netfilter-persistent save
+```
 
 ---
 
@@ -168,6 +193,4 @@ sudo netfilter-persistent save
 
   tcpdump cheatsheet - https://danielmiessler.com/study/tcpdump/
 
-
-
-
+---
